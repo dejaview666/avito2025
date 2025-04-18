@@ -28,7 +28,7 @@ class TestAdServiceAPI:
             headers={"Accept": "application/json"}
         )
         assert response.status_code == 200
-        return response.json()  # Возвращаем весь ответ API
+        return response.json()
 
     def test_create_ad_valid_data(self):
         """Тест создания объявления с валидными данными"""
@@ -57,7 +57,6 @@ class TestAdServiceAPI:
 
     def test_get_ad_by_id(self, test_ad):
         """Тест получения объявления по ID"""
-        # Извлекаем ID из сообщения статуса
         status_message = test_ad["status"]
         ad_id = status_message.split(" - ")[-1]
 
@@ -73,20 +72,18 @@ class TestAdServiceAPI:
 
     def test_get_nonexistent_ad(self):
         """Тест получения несуществующего объявления"""
-        # Генерируем случайный UUID
         random_id = str(uuid.uuid4())
         response = requests.get(
             f"{BASE_URL}/api/1/item/{random_id}",
             headers={"Accept": "application/json"}
         )
 
-        # API возвращает 404 для несуществующих ID
+
         assert response.status_code == 404
 
     def test_get_ads_by_seller(self, test_ad):
         """Тест получения всех объявлений продавца"""
-        # Извлекаем sellerID из фикстуры (предполагаем, что он есть в ответе)
-        seller_id = test_ad.get("sellerId", 123456)  # Значение по умолчанию для теста
+        seller_id = test_ad.get("sellerId", 123456)
 
         response = requests.get(
             f"{BASE_URL}/api/1/{seller_id}/item",
@@ -99,7 +96,6 @@ class TestAdServiceAPI:
 
     def test_get_ad_statistics(self, test_ad):
         """Тест получения статистики объявления"""
-        # Извлекаем ID из сообщения статуса
         status_message = test_ad["status"]
         ad_id = status_message.split(" - ")[-1]
 
@@ -119,21 +115,20 @@ class TestAdServiceAPI:
 
     def test_delete_ad(self, test_ad):
         """Тест удаления объявления"""
-        # Извлекаем ID из сообщения статуса
         status_message = test_ad["status"]
         ad_id = status_message.split(" - ")[-1]
 
-        # Сначала убедимся, что объявление существует
+
         response = requests.get(f"{BASE_URL}/api/1/item/{ad_id}")
         assert response.status_code == 200
 
-        # Удаляем объявление
+
         response = requests.delete(
             f"{BASE_URL}/api/2/item/{ad_id}",
             headers={"Accept": "application/json"}
         )
         assert response.status_code == 200
 
-        # Проверяем, что объявление больше не доступно
+
         response = requests.get(f"{BASE_URL}/api/1/item/{ad_id}")
-        assert response.status_code == 404  # API возвращает 404 для удаленных объявлений
+        assert response.status_code == 404
